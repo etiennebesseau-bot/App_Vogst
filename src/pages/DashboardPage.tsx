@@ -6,7 +6,7 @@ import TaskCard from '../components/TaskCard'
 
 export default function DashboardPage() {
   const { currentResident, currentApartment, getResidentStats, tasks, isTaskAvailable, completeTask, clearResident, refresh } = useApp()
-  const { permission, subscribed, subscribe } = usePushNotifications()
+  const { permission, subscribed, subscribe, error: pushError } = usePushNotifications()
   const navigate = useNavigate()
 
   if (!currentResident || !currentApartment) {
@@ -64,18 +64,23 @@ export default function DashboardPage() {
         </div>
       )}
       {showRetryBanner && (
-        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-2xl">⚠️</span>
-          <div className="flex-1">
-            <p className="font-semibold text-red-900 text-sm">Aktivierung fehlgeschlagen</p>
-            <p className="text-red-700 text-xs mt-0.5">Bitte nochmal versuchen</p>
+        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex flex-col gap-2">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div className="flex-1">
+              <p className="font-semibold text-red-900 text-sm">Aktivierung fehlgeschlagen</p>
+              <p className="text-red-700 text-xs mt-0.5">Bitte nochmal versuchen</p>
+            </div>
+            <button
+              onClick={subscribe}
+              className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
+            >
+              Retry
+            </button>
           </div>
-          <button
-            onClick={subscribe}
-            className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
-          >
-            Retry
-          </button>
+          {pushError && (
+            <p className="text-red-600 text-xs font-mono bg-red-100 rounded-lg px-3 py-2 break-all">{pushError}</p>
+          )}
         </div>
       )}
       {subscribed && (

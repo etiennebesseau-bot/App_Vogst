@@ -15,6 +15,7 @@ export function usePushNotifications() {
     'Notification' in window ? Notification.permission : 'denied',
   )
   const [subscribed, setSubscribed] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if ('serviceWorker' in navigator && permission === 'granted') {
@@ -47,9 +48,11 @@ export function usePushNotifications() {
       await savePushSubscription(sub)
       setSubscribed(true)
     } catch (err) {
+      const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+      setError(msg)
       console.error('Push-Abo Fehler:', err)
     }
   }
 
-  return { permission, subscribed, subscribe }
+  return { permission, subscribed, subscribe, error }
 }
