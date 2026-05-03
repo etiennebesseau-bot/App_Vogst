@@ -29,6 +29,7 @@ interface AppContextType {
   getResidentStats: (residentId: string) => ResidentStats
   getLastCompletion: (taskId: string) => TaskCompletion | null
   getMyLastCompletion: (taskId: string) => TaskCompletion | null
+  refresh: () => Promise<void>
 }
 
 const AppContext = createContext<AppContextType | null>(null)
@@ -177,6 +178,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [completions],
   )
 
+  const refresh = useCallback(async () => {
+    const data = await fetchCompletions()
+    setCompletions(data)
+  }, [])
+
   const completeTask = useCallback(
     async (task: Task) => {
       if (!currentResidentId) return
@@ -218,7 +224,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       apartments: APARTMENTS, residents: RESIDENTS, tasks: TASKS, categories: CATEGORIES,
       completions, loading, currentResidentId, currentResident, currentApartment,
       selectResident, clearResident, completeTask, undoCompletion,
-      isTaskAvailable, getResidentStats, getLastCompletion, getMyLastCompletion,
+      isTaskAvailable, getResidentStats, getLastCompletion, getMyLastCompletion, refresh,
     }}>
       {children}
     </AppContext.Provider>

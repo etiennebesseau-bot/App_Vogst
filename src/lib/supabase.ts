@@ -39,6 +39,16 @@ export async function deleteCompletion(id: string): Promise<void> {
   if (error) throw error
 }
 
+export async function deleteCompletionsByResident(residentId: string): Promise<void> {
+  const { error } = await supabase.from('task_completions').delete().eq('resident_id', residentId)
+  if (error) throw error
+}
+
+export async function deleteAllCompletions(): Promise<void> {
+  const { error } = await supabase.from('task_completions').delete().neq('id', '')
+  if (error) throw error
+}
+
 // ─── Push subscriptions ───────────────────────────────────────────────────────
 
 export async function savePushSubscription(sub: PushSubscription): Promise<void> {

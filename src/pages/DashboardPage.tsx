@@ -5,7 +5,7 @@ import LevelBadge from '../components/LevelBadge'
 import TaskCard from '../components/TaskCard'
 
 export default function DashboardPage() {
-  const { currentResident, currentApartment, getResidentStats, tasks, isTaskAvailable, completeTask, clearResident } = useApp()
+  const { currentResident, currentApartment, getResidentStats, tasks, isTaskAvailable, completeTask, clearResident, refresh } = useApp()
   const { permission, subscribed, subscribe } = usePushNotifications()
   const navigate = useNavigate()
 
@@ -31,9 +31,12 @@ export default function DashboardPage() {
               <LevelBadge levelInfo={stats.levelInfo} small />
             </div>
           </div>
-          <button onClick={() => { clearResident(); navigate('/') }} className="text-white/60 text-xs mt-1 hover:text-white transition-colors">
-            Wechseln
-          </button>
+          <div className="flex flex-col items-end gap-2">
+            <button onClick={() => { clearResident(); navigate('/') }} className="text-white/60 text-xs hover:text-white transition-colors">
+              Wechseln
+            </button>
+            <button onClick={refresh} className="text-white/60 text-xl active:scale-90 transition-transform leading-none">🔄</button>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
