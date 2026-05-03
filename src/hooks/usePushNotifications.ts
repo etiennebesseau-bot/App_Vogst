@@ -19,7 +19,14 @@ export function usePushNotifications() {
   useEffect(() => {
     if ('serviceWorker' in navigator && permission === 'granted') {
       navigator.serviceWorker.ready.then(reg => {
-        reg.pushManager.getSubscription().then(sub => setSubscribed(!!sub))
+        reg.pushManager.getSubscription().then(sub => {
+          if (sub) {
+            setSubscribed(true)
+            savePushSubscription(sub).catch(console.error)
+          } else {
+            setSubscribed(false)
+          }
+        })
       })
     }
   }, [permission])
