@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { Apartment, Resident } from '../types'
 
 export default function WelcomePage() {
   const { apartments, residents, selectResident, getResidentStats } = useApp()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [selectedApt, setSelectedApt] = useState<Apartment | null>(null)
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const apt = params.get('apt')
+    const apt = searchParams.get('apt')
     if (apt) {
       const found = apartments.find(a => a.id === `apt-${apt.toLowerCase()}`)
       if (found) setSelectedApt(found)
     }
-  }, [apartments])
+  }, [apartments, searchParams])
 
   function handleResident(resident: Resident) {
     selectResident(resident.id)
