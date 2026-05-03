@@ -7,11 +7,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       manifest: {
         name: 'Vogesenstrasse',
-        short_name: 'Vogesenstr.',
-        description: 'Tâches & points pour la maison',
+        short_name: 'Vogst',
+        description: 'Aufgaben & Punkte für das Haus',
         theme_color: '#7C3AED',
         background_color: '#F5F3FF',
         display: 'standalone',

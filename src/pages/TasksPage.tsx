@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext'
 import TaskCard from '../components/TaskCard'
 
 export default function TasksPage() {
-  const { tasks, categories, isTaskAvailable, completeTask, getLastCompletion } = useApp()
+  const { tasks, categories, isTaskAvailable, completeTask, undoCompletion, getLastCompletion, getMyLastCompletion } = useApp()
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
   const [showDone, setShowDone] = useState(false)
 
@@ -24,17 +24,13 @@ export default function TasksPage() {
         <div className="flex gap-2 mb-3">
           <button
             onClick={() => setShowDone(false)}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
-              !showDone ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500'
-            }`}
+            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${!showDone ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500'}`}
           >
             Verfügbar ({availableCount})
           </button>
           <button
             onClick={() => setShowDone(true)}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
-              showDone ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500'
-            }`}
+            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${showDone ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-500'}`}
           >
             Erledigt ({doneCount})
           </button>
@@ -46,7 +42,7 @@ export default function TasksPage() {
             <Pill
               key={cat.id}
               active={selectedCat === cat.id}
-              onClick={() => setSelectedCat(prev => (prev === cat.id ? null : cat.id))}
+              onClick={() => setSelectedCat(prev => prev === cat.id ? null : cat.id)}
             >
               {cat.icon} {cat.name}
             </Pill>
@@ -63,36 +59,31 @@ export default function TasksPage() {
             </p>
           </div>
         ) : (
-          filtered.map(task => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              completed={!isTaskAvailable(task)}
-              lastCompletion={getLastCompletion(task.id)}
-              onComplete={() => completeTask(task)}
-            />
-          ))
+          filtered.map(task => {
+            const myLast = getMyLastCompletion(task.id)
+            const anyLast = getLastCompletion(task.id)
+            return (
+              <TaskCard
+                key={task.id}
+                task={task}
+                completed={!isTaskAvailable(task)}
+                lastCompletion={anyLast}
+                onComplete={() => completeTask(task)}
+                onUndo={showDone && myLast ? () => undoCompletion(myLast.id) : undefined}
+              />
+            )
+          })
         )}
       </div>
     </div>
   )
 }
 
-function Pill({
-  children,
-  active,
-  onClick,
-}: {
-  children: React.ReactNode
-  active: boolean
-  onClick: () => void
-}) {
+function Pill({ children, active, onClick }: { children: React.ReactNode; active: boolean; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-shrink-0 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-        active ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-      }`}
+      className={`flex-shrink-0 px-3 py-1 rounded-full text-sm font-medium transition-colors ${active ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'}`}
     >
       {children}
     </button>

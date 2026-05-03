@@ -2,42 +2,39 @@ import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 
 const MEDALS = ['🥇', '🥈', '🥉']
+const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember']
 
 export default function LeaderboardPage() {
   const { residents, apartments, getResidentStats, currentResidentId } = useApp()
-  const [period, setPeriod] = useState<'weekly' | 'total'>('weekly')
+  const [period, setPeriod] = useState<'monthly' | 'total'>('monthly')
+
+  const currentMonth = MONTH_NAMES[new Date().getMonth()]
 
   const ranked = residents
-    .map(r => ({
-      resident:  r,
-      apartment: apartments.find(a => a.id === r.apartmentId)!,
-      stats:     getResidentStats(r.id),
-    }))
+    .map(r => ({ resident: r, apartment: apartments.find(a => a.id === r.apartmentId)!, stats: getResidentStats(r.id) }))
     .sort((a, b) => {
-      const ap = period === 'weekly' ? a.stats.weeklyPoints : a.stats.totalPoints
-      const bp = period === 'weekly' ? b.stats.weeklyPoints : b.stats.totalPoints
+      const ap = period === 'monthly' ? a.stats.monthlyPoints : a.stats.totalPoints
+      const bp = period === 'monthly' ? b.stats.monthlyPoints : b.stats.totalPoints
       return bp - ap
     })
 
   return (
     <div className="pb-28">
       <div className="bg-violet-600 pt-14 pb-8 px-4 rounded-b-3xl">
-        <h1 className="font-extrabold text-2xl text-white mb-4">Rangliste</h1>
+        <h1 className="font-extrabold text-2xl text-white mb-1">Rangliste</h1>
+        {period === 'monthly' && (
+          <p className="text-white/60 text-xs mb-4">Team mit den wenigsten Punkten lädt ein 🍽️</p>
+        )}
         <div className="flex gap-2">
-          <TabBtn active={period === 'weekly'} onClick={() => setPeriod('weekly')}>
-            Diese Woche
-          </TabBtn>
-          <TabBtn active={period === 'total'} onClick={() => setPeriod('total')}>
-            Gesamt
-          </TabBtn>
+          <TabBtn active={period === 'monthly'} onClick={() => setPeriod('monthly')}>{currentMonth}</TabBtn>
+          <TabBtn active={period === 'total'} onClick={() => setPeriod('total')}>Gesamt</TabBtn>
         </div>
       </div>
 
-      {/* Podium */}
       {ranked.length >= 3 && (
         <div className="flex justify-center items-end gap-4 px-4 mt-6 mb-2">
           {[ranked[1], ranked[0], ranked[2]].map((entry, i) => {
-            const pts = period === 'weekly' ? entry.stats.weeklyPoints : entry.stats.totalPoints
+            const pts = period === 'monthly' ? entry.stats.monthlyPoints : entry.stats.totalPoints
             const heights = ['h-24', 'h-32', 'h-20']
             const ranks = [1, 0, 2]
             return (
@@ -46,10 +43,7 @@ export default function LeaderboardPage() {
                 <span className="text-xs font-semibold text-gray-600">{entry.resident.name}</span>
                 <div
                   className={`${heights[i]} w-20 rounded-t-xl flex flex-col items-center justify-center`}
-                  style={{
-                    backgroundColor: entry.apartment.color + '33',
-                    border: `2px solid ${entry.apartment.color}`,
-                  }}
+                  style={{ backgroundColor: entry.apartment.color + '33', border: `2px solid ${entry.apartment.color}` }}
                 >
                   <span className="text-xl">{MEDALS[ranks[i]]}</span>
                   <span className="font-bold text-sm text-gray-800">{pts}</span>
@@ -63,15 +57,12 @@ export default function LeaderboardPage() {
 
       <div className="px-4 mt-4 space-y-2">
         {ranked.map((entry, index) => {
-          const pts = period === 'weekly' ? entry.stats.weeklyPoints : entry.stats.totalPoints
+          const pts = period === 'monthly' ? entry.stats.monthlyPoints : entry.stats.totalPoints
           const isMe = entry.resident.id === currentResidentId
-
           return (
             <div
               key={entry.resident.id}
-              className={`flex items-center gap-3 p-4 rounded-2xl border-2 ${
-                isMe ? 'border-violet-300 bg-violet-50' : 'border-gray-100 bg-white'
-              }`}
+              className={`flex items-center gap-3 p-4 rounded-2xl border-2 ${isMe ? 'border-violet-300 bg-violet-50' : 'border-gray-100 bg-white'}`}
             >
               <div className="w-8 text-center font-bold text-lg text-gray-500">
                 {index < 3 ? MEDALS[index] : index + 1}
@@ -80,18 +71,14 @@ export default function LeaderboardPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-gray-900 truncate">{entry.resident.name}</span>
-                  {isMe && (
-                    <span className="text-xs bg-violet-200 text-violet-700 px-2 py-0.5 rounded-full flex-shrink-0">
-                      Ich
-                    </span>
-                  )}
+                  {isMe && <span className="text-xs bg-violet-200 text-violet-700 px-2 py-0.5 rounded-full flex-shrink-0">Ich</span>}
                 </div>
                 <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
                   <span style={{ color: entry.apartment.color }}>●</span>
                   {entry.apartment.name}
                   <span className="mx-1">·</span>
                   {entry.stats.levelInfo.emoji} {entry.stats.levelInfo.name}
-                  {entry.stats.streak > 1 && <span className="ml-1">· 🔥 {entry.stats.streak}T</span>}
+                  {entry.stats.streak > 1 && <span className="ml-1">· 🔥{entry.stats.streak}T</span>}
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
@@ -106,22 +93,9 @@ export default function LeaderboardPage() {
   )
 }
 
-function TabBtn({
-  children,
-  active,
-  onClick,
-}: {
-  children: React.ReactNode
-  active: boolean
-  onClick: () => void
-}) {
+function TabBtn({ children, active, onClick }: { children: React.ReactNode; active: boolean; onClick: () => void }) {
   return (
-    <button
-      onClick={onClick}
-      className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${
-        active ? 'bg-white text-violet-600' : 'bg-white/20 text-white'
-      }`}
-    >
+    <button onClick={onClick} className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${active ? 'bg-white text-violet-600' : 'bg-white/20 text-white'}`}>
       {children}
     </button>
   )

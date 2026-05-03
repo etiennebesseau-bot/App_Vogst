@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useMemo, useCallback, useState, useEffect } from 'react'
 import { Apartment, Resident, Task, Category, TaskCompletion, LevelInfo } from '../types'
 import { APARTMENTS, RESIDENTS, TASKS, CATEGORIES, getLevelInfo } from '../data/initial'
-import { supabase, fetchCompletions, insertCompletion } from '../lib/supabase'
+import { supabase, fetchCompletions, insertCompletion, deleteCompletion } from '../lib/supabase'
 
 export interface ResidentStats {
   totalPoints: number
-  weeklyPoints: number
+  monthlyPoints: number
   streak: number
   levelInfo: LevelInfo
   completionsCount: number
@@ -24,16 +24,18 @@ interface AppContextType {
   selectResident: (id: string) => void
   clearResident: () => void
   completeTask: (task: Task) => Promise<void>
+  undoCompletion: (completionId: string) => Promise<void>
   isTaskAvailable: (task: Task) => boolean
   getResidentStats: (residentId: string) => ResidentStats
   getLastCompletion: (taskId: string) => TaskCompletion | null
+  getMyLastCompletion: (taskId: string) => TaskCompletion | null
 }
 
 const AppContext = createContext<AppContextType | null>(null)
 const RESIDENT_KEY = 'vogesenstrasse_resident'
 
-const ADVANCE_MS = 2 * 24 * 60 * 60 * 1000  // 2 Tage vorher
-const GRACE_MS   = 24 * 60 * 60 * 1000       // 1 Tag nachher
+const ADVANCE_MS = 2 * 24 * 60 * 60 * 1000
+const GRACE_MS   = 24 * 60 * 60 * 1000
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [completions, setCompletions] = useState<TaskCompletion[]>([])
@@ -52,8 +54,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const channel = supabase
       .channel('task_completions')
-      .on(
-        'postgres_changes',
+      .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'task_completions' },
         payload => {
           const row = payload.new as Record<string, unknown>
@@ -64,9 +65,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             completedAt:  row.completed_at as string,
             pointsEarned: row.points_earned as number,
           }
-          setCompletions(prev => (prev.some(x => x.id === c.id) ? prev : [c, ...prev]))
-        },
-      )
+          setCompletions(prev => prev.some(x => x.id === c.id) ? prev : [c, ...prev])
+        })
+      .on('postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'task_completions' },
+        payload => {
+          const id = (payload.old as Record<string, unknown>).id as string
+          setCompletions(prev => prev.filter(c => c.id !== id))
+        })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [])
@@ -82,15 +88,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const currentResident = useMemo(
-    () => (currentResidentId ? (RESIDENTS.find(r => r.id === currentResidentId) ?? null) : null),
+    () => currentResidentId ? (RESIDENTS.find(r => r.id === currentResidentId) ?? null) : null,
     [currentResidentId],
   )
 
   const currentApartment = useMemo(
-    () =>
-      currentResident
-        ? (APARTMENTS.find(a => a.id === currentResident.apartmentId) ?? null)
-        : null,
+    () => currentResident ? (APARTMENTS.find(a => a.id === currentResident.apartmentId) ?? null) : null,
     [currentResident],
   )
 
@@ -98,16 +101,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (taskId: string): TaskCompletion | null =>
       completions
         .filter(c => c.taskId === taskId)
-        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0] ??
-      null,
+        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0] ?? null,
     [completions],
+  )
+
+  const getMyLastCompletion = useCallback(
+    (taskId: string): TaskCompletion | null =>
+      completions
+        .filter(c => c.taskId === taskId && c.residentId === currentResidentId)
+        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0] ?? null,
+    [completions, currentResidentId],
   )
 
   const isTaskAvailable = useCallback(
     (task: Task): boolean => {
       const now = Date.now()
 
-      // Abfuhrtermine: nur verfügbar im Zeitfenster um den Termin
       if (task.scheduledDates && task.scheduledDates.length > 0) {
         const activeDate = task.scheduledDates.find(dateStr => {
           const d = new Date(dateStr).getTime()
@@ -120,23 +129,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         )
       }
 
-      // Soziale Aufgaben: pro Person, unabhängig voneinander
       if (task.perResident && currentResidentId) {
         const last = completions
           .filter(c => c.taskId === task.id && c.residentId === currentResidentId)
           .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0]
         if (!last) return true
-        const days = (now - new Date(last.completedAt).getTime()) / 86400000
-        return days >= (task.recurrenceDays ?? 7)
+        return (now - new Date(last.completedAt).getTime()) / 86400000 >= (task.recurrenceDays ?? 7)
       }
 
-      // Standard: globale Wiederholung (wer auch immer es zuletzt gemacht hat)
       const last = completions
         .filter(c => c.taskId === task.id)
         .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0]
       if (!last) return true
-      const days = (now - new Date(last.completedAt).getTime()) / 86400000
-      return days >= (task.recurrenceDays ?? 7)
+      return (now - new Date(last.completedAt).getTime()) / 86400000 >= (task.recurrenceDays ?? 7)
     },
     [completions, currentResidentId],
   )
@@ -146,14 +151,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const mine = completions.filter(c => c.residentId === residentId)
       const totalPoints = mine.reduce((s, c) => s + c.pointsEarned, 0)
 
-      const weekAgo = new Date(Date.now() - 7 * 86400000)
-      const weeklyPoints = mine
-        .filter(c => new Date(c.completedAt) >= weekAgo)
+      const now = new Date()
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      const monthlyPoints = mine
+        .filter(c => new Date(c.completedAt) >= monthStart)
         .reduce((s, c) => s + c.pointsEarned, 0)
 
-      const days = [
-        ...new Set(mine.map(c => new Date(c.completedAt).toDateString())),
-      ].sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+      const days = [...new Set(mine.map(c => new Date(c.completedAt).toDateString()))]
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
 
       let streak = 0
       const today = new Date().toDateString()
@@ -167,13 +172,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      return {
-        totalPoints,
-        weeklyPoints,
-        streak,
-        levelInfo: getLevelInfo(totalPoints),
-        completionsCount: mine.length,
-      }
+      return { totalPoints, monthlyPoints, streak, levelInfo: getLevelInfo(totalPoints), completionsCount: mine.length }
     },
     [completions],
   )
@@ -199,26 +198,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [currentResidentId],
   )
 
+  const undoCompletion = useCallback(
+    async (completionId: string) => {
+      const completion = completions.find(c => c.id === completionId)
+      if (!completion) return
+      setCompletions(prev => prev.filter(c => c.id !== completionId))
+      try {
+        await deleteCompletion(completionId)
+      } catch (err) {
+        setCompletions(prev => [completion, ...prev])
+        console.error('Supabase Fehler:', err)
+      }
+    },
+    [completions],
+  )
+
   return (
-    <AppContext.Provider
-      value={{
-        apartments: APARTMENTS,
-        residents: RESIDENTS,
-        tasks: TASKS,
-        categories: CATEGORIES,
-        completions,
-        loading,
-        currentResidentId,
-        currentResident,
-        currentApartment,
-        selectResident,
-        clearResident,
-        completeTask,
-        isTaskAvailable,
-        getResidentStats,
-        getLastCompletion,
-      }}
-    >
+    <AppContext.Provider value={{
+      apartments: APARTMENTS, residents: RESIDENTS, tasks: TASKS, categories: CATEGORIES,
+      completions, loading, currentResidentId, currentResident, currentApartment,
+      selectResident, clearResident, completeTask, undoCompletion,
+      isTaskAvailable, getResidentStats, getLastCompletion, getMyLastCompletion,
+    }}>
       {children}
     </AppContext.Provider>
   )
