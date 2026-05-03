@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const stats = getResidentStats(currentResident.id)
   const availableTasks = tasks.filter(isTaskAvailable).slice(0, 3)
   const showNotifBanner = permission === 'default' && !subscribed
+  const showRetryBanner = permission === 'granted' && !subscribed
 
   return (
     <div className="pb-28">
@@ -59,6 +60,21 @@ export default function DashboardPage() {
             className="bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
           >
             Aktivieren
+          </button>
+        </div>
+      )}
+      {showRetryBanner && (
+        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
+          <span className="text-2xl">⚠️</span>
+          <div className="flex-1">
+            <p className="font-semibold text-red-900 text-sm">Aktivierung fehlgeschlagen</p>
+            <p className="text-red-700 text-xs mt-0.5">Bitte nochmal versuchen</p>
+          </div>
+          <button
+            onClick={subscribe}
+            className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
+          >
+            Retry
           </button>
         </div>
       )}
