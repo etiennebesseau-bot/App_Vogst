@@ -244,81 +244,76 @@ export default function KassePage() {
             style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
             onClick={e => e.stopPropagation()}
           >
-            <div className="p-6 space-y-4">
-            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto" />
-            <h2 className="font-extrabold text-xl text-gray-900">Neue Ausgabe</h2>
+            <div className="p-4 space-y-3">
+            <div className="w-8 h-1 bg-gray-200 rounded-full mx-auto" />
+            <h2 className="font-extrabold text-lg text-gray-900">Neue Ausgabe</h2>
 
-            <input
-              placeholder="Beschreibung (z.B. Pizza)"
-              value={desc}
-              onChange={e => setDesc(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-emerald-400"
-            />
-
-            <div className="relative">
+            {/* Beschreibung + Betrag auf einer Zeile */}
+            <div className="flex gap-2">
               <input
-                placeholder="0.00"
-                inputMode="decimal"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-emerald-400 pr-10"
+                placeholder="Beschreibung"
+                value={desc}
+                onChange={e => setDesc(e.target.value)}
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-emerald-400"
               />
-              <span className="absolute right-4 top-3.5 text-gray-400 font-semibold">€</span>
-            </div>
-
-            <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Wer hat bezahlt?</p>
-              <div className="grid grid-cols-3 gap-2">
-                {RESIDENTS.map(r => {
-                  const apt = APARTMENTS.find(a => a.id === r.apartmentId)!
-                  return (
-                    <button
-                      key={r.id}
-                      onClick={() => setPaidBy(r.id)}
-                      className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all ${paidBy === r.id ? 'border-emerald-400 bg-emerald-50' : 'border-gray-100'}`}
-                    >
-                      <span className="text-xl">{r.emoji}</span>
-                      <span className="text-xs font-semibold text-gray-800 mt-0.5">{r.name}</span>
-                      <span className="text-xs" style={{ color: apt.color }}>{apt.name}</span>
-                    </button>
-                  )
-                })}
+              <div className="relative w-28">
+                <input
+                  placeholder="0.00"
+                  inputMode="decimal"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-emerald-400 pr-7"
+                />
+                <span className="absolute right-3 top-2.5 text-gray-400 text-sm font-semibold">€</span>
               </div>
             </div>
 
+            {/* Wer hat bezahlt */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Wer ist dabei?</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Wer hat bezahlt?</p>
+              <div className="grid grid-cols-6 gap-1.5">
+                {RESIDENTS.map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => setPaidBy(r.id)}
+                    className={`flex flex-col items-center py-1.5 rounded-xl border-2 transition-all ${paidBy === r.id ? 'border-emerald-400 bg-emerald-50' : 'border-gray-100'}`}
+                  >
+                    <span className="text-lg">{r.emoji}</span>
+                    <span className="text-xs font-medium text-gray-700 truncate w-full text-center px-0.5">{r.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Wer ist dabei */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Wer ist dabei?</p>
                 <button
                   onClick={() => setParts(parts.length === RESIDENTS.length ? [] : RESIDENTS.map(r => r.id))}
                   className="text-xs text-emerald-600 font-semibold"
                 >
-                  {parts.length === RESIDENTS.length ? 'Alle abwählen' : 'Alle wählen'}
+                  {parts.length === RESIDENTS.length ? 'Alle abwählen' : 'Alle'}
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {RESIDENTS.map(r => {
-                  const selected = parts.includes(r.id)
-                  const apt = APARTMENTS.find(a => a.id === r.apartmentId)!
-                  return (
-                    <button
-                      key={r.id}
-                      onClick={() => togglePart(r.id)}
-                      className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all ${selected ? 'border-emerald-400 bg-emerald-50' : 'border-gray-100 opacity-50'}`}
-                    >
-                      <span className="text-xl">{r.emoji}</span>
-                      <span className="text-xs font-semibold text-gray-800 mt-0.5">{r.name}</span>
-                      <span className="text-xs" style={{ color: apt.color }}>{apt.name}</span>
-                    </button>
-                  )
-                })}
+              <div className="grid grid-cols-6 gap-1.5">
+                {RESIDENTS.map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => togglePart(r.id)}
+                    className={`flex flex-col items-center py-1.5 rounded-xl border-2 transition-all ${parts.includes(r.id) ? 'border-emerald-400 bg-emerald-50' : 'border-gray-100 opacity-40'}`}
+                  >
+                    <span className="text-lg">{r.emoji}</span>
+                    <span className="text-xs font-medium text-gray-700 truncate w-full text-center px-0.5">{r.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
             <button
               onClick={submit}
               disabled={saving || !desc.trim() || !amount || parts.length === 0}
-              className="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-transform disabled:opacity-50"
+              className="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl active:scale-95 transition-transform disabled:opacity-50"
             >
               {saving ? 'Speichern…' : 'Hinzufügen'}
             </button>
