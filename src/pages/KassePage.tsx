@@ -223,9 +223,13 @@ export default function KassePage() {
 
       {/* ── Add expense modal ── */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowForm(false)} />
-          <div className="relative w-full max-w-md mx-auto bg-white rounded-t-3xl overflow-y-auto max-h-[90vh]">
+        <>
+          <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setShowForm(false)} />
+          <div
+            className="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto bg-white rounded-t-3xl overflow-y-auto max-h-[90vh]"
+            style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+            onClick={e => e.stopPropagation()}
+          >
             <div className="p-6 space-y-4">
             <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto" />
             <h2 className="font-extrabold text-xl text-gray-900">Neue Ausgabe</h2>
@@ -304,9 +308,11 @@ export default function KassePage() {
             >
               {saving ? 'Speichern…' : 'Hinzufügen'}
             </button>
-            <div className="h-4" />
+            <div className="h-6" />
             </div>
           </div>
+        </>
+
         </div>
       )}
     </div>
