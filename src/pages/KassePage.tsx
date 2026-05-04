@@ -55,6 +55,20 @@ export default function KassePage() {
   const [saving, setSaving]         = useState(false)
 
   useEffect(() => {
+    if (showForm) {
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    } else {
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+    return () => {
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+  }, [showForm])
+
+  useEffect(() => {
     fetchExpenses().then(setExpenses).catch(console.error).finally(() => setLoading(false))
 
     const ch = supabase.channel('expenses')
