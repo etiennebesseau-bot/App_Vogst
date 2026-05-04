@@ -35,7 +35,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | null>(null)
 const RESIDENT_KEY = 'vogesenstrasse_resident'
 
-const ADVANCE_MS = 2 * 24 * 60 * 60 * 1000
+const ADVANCE_MS = 10 * 24 * 60 * 60 * 1000
 const GRACE_MS   = 24 * 60 * 60 * 1000
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
