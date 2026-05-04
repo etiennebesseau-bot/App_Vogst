@@ -42,6 +42,15 @@ export interface TaskCompletion {
   pointsEarned: number
 }
 
+export interface Expense {
+  id: string
+  description: string
+  amount: number
+  paidBy: string
+  participants: string[]
+  createdAt: string
+}
+
 export interface LevelInfo {
   level: number
   name: string

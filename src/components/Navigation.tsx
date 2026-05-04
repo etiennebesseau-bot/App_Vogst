@@ -5,6 +5,7 @@ const ITEMS = [
   { to: '/dashboard',   icon: '🏠', label: 'Start'      },
   { to: '/tasks',       icon: '✅', label: 'Aufgaben'   },
   { to: '/leaderboard', icon: '🏆', label: 'Rangliste'  },
+  { to: '/kasse',       icon: '💸', label: 'Kasse'      },
 ]
 
 export default function Navigation() {

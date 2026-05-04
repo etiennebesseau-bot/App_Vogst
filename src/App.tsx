@@ -5,6 +5,7 @@ import DashboardPage from './pages/DashboardPage'
 import TasksPage from './pages/TasksPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import AdminPage from './pages/AdminPage'
+import KassePage from './pages/KassePage'
 import Navigation from './components/Navigation'
 
 function Guard({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/dashboard"   element={<Guard><DashboardPage /></Guard>} />
         <Route path="/tasks"       element={<Guard><TasksPage /></Guard>} />
         <Route path="/leaderboard" element={<Guard><LeaderboardPage /></Guard>} />
+        <Route path="/kasse"       element={<Guard><KassePage /></Guard>} />
         <Route path="/admin"       element={<AdminPage />} />
         <Route path="*"            element={<Navigate to="/" replace />} />
       </Routes>

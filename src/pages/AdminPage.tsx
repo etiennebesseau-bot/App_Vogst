@@ -4,7 +4,7 @@ import { supabase, deleteCompletion, deleteCompletionsByResident, deleteAllCompl
 import { RESIDENTS, APARTMENTS, TASKS } from '../data/initial'
 import { TaskCompletion } from '../types'
 
-const ADMIN_PIN = '1234'
+const ADMIN_PIN = '3242'
 
 export default function AdminPage() {
   const [pin, setPin]           = useState('')

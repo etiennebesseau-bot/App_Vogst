@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { TaskCompletion } from '../types'
+import { TaskCompletion, Expense } from '../types'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -46,6 +46,43 @@ export async function deleteCompletionsByResident(residentId: string): Promise<v
 
 export async function deleteAllCompletions(): Promise<void> {
   const { error } = await supabase.from('task_completions').delete().neq('id', '')
+  if (error) throw error
+}
+
+// ─── Expenses ─────────────────────────────────────────────────────────────────
+
+export function mapExpense(row: Record<string, unknown>): Expense {
+  return {
+    id:           row.id as string,
+    description:  row.description as string,
+    amount:       Number(row.amount),
+    paidBy:       row.paid_by as string,
+    participants: row.participants as string[],
+    createdAt:    row.created_at as string,
+  }
+}
+
+export async function fetchExpenses(): Promise<Expense[]> {
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []).map(mapExpense)
+}
+
+export async function insertExpense(e: Omit<Expense, 'id' | 'createdAt'>): Promise<void> {
+  const { error } = await supabase.from('expenses').insert({
+    description:  e.description,
+    amount:       e.amount,
+    paid_by:      e.paidBy,
+    participants: e.participants,
+  })
+  if (error) throw error
+}
+
+export async function deleteExpense(id: string): Promise<void> {
+  const { error } = await supabase.from('expenses').delete().eq('id', id)
   if (error) throw error
 }
 
