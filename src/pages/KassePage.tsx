@@ -54,19 +54,6 @@ export default function KassePage() {
   const [parts, setParts]           = useState<string[]>(RESIDENTS.map(r => r.id))
   const [saving, setSaving]         = useState(false)
 
-  useEffect(() => {
-    if (showForm) {
-      document.body.style.position = 'fixed'
-      document.body.style.width = '100%'
-    } else {
-      document.body.style.position = ''
-      document.body.style.width = ''
-    }
-    return () => {
-      document.body.style.position = ''
-      document.body.style.width = ''
-    }
-  }, [showForm])
 
   useEffect(() => {
     fetchExpenses().then(setExpenses).catch(console.error).finally(() => setLoading(false))
@@ -238,13 +225,13 @@ export default function KassePage() {
       {/* ── Add expense modal ── */}
       {showForm && (
         <>
-          <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setShowForm(false)} />
+          <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setShowForm(false)} />
           <div
-            className="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto bg-white rounded-t-3xl overflow-y-auto max-h-[90vh]"
-            style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
+            className="fixed inset-x-4 top-[5%] z-50 max-w-sm mx-auto bg-white rounded-2xl shadow-xl overflow-hidden"
+            style={{ maxHeight: '88vh' }}
             onClick={e => e.stopPropagation()}
           >
-            <div className="p-4 space-y-3">
+            <div className="overflow-y-auto p-4 space-y-3" style={{ maxHeight: '88vh', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
             <div className="w-8 h-1 bg-gray-200 rounded-full mx-auto" />
             <h2 className="font-extrabold text-lg text-gray-900">Neue Ausgabe</h2>
 
@@ -317,7 +304,6 @@ export default function KassePage() {
             >
               {saving ? 'Speichern…' : 'Hinzufügen'}
             </button>
-            <div className="h-6" />
             </div>
           </div>
         </>
