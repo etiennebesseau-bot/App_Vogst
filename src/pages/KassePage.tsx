@@ -216,7 +216,7 @@ export default function KassePage() {
       {/* ── Floating add button ── */}
       <button
         onClick={() => { setPaidBy(currentResidentId ?? RESIDENTS[0].id); setShowForm(true) }}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-emerald-600 text-white text-3xl rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
+        className="fixed bottom-32 right-4 w-14 h-14 bg-emerald-600 text-white text-3xl rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
       >
         +
       </button>
@@ -225,9 +225,12 @@ export default function KassePage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end" onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowForm(false)} />
-          <div className="relative w-full max-w-md mx-auto bg-white rounded-t-3xl p-6 pb-10 space-y-4">
-            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-2" />
-            <h2 className="font-extrabold text-xl text-gray-900">Neue Ausgabe</h2>
+          <div className="relative w-full max-w-md mx-auto bg-white rounded-t-3xl flex flex-col max-h-[90vh]">
+            <div className="px-6 pt-6 pb-2 flex-shrink-0">
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
+              <h2 className="font-extrabold text-xl text-gray-900">Neue Ausgabe</h2>
+            </div>
+            <div className="overflow-y-auto px-6 pb-2 space-y-4 flex-1">
 
             <input
               placeholder="Beschreibung (z.B. Pizza)"
@@ -296,13 +299,16 @@ export default function KassePage() {
               </div>
             </div>
 
-            <button
-              onClick={submit}
-              disabled={saving || !desc.trim() || !amount || parts.length === 0}
-              className="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-transform disabled:opacity-50"
-            >
-              {saving ? 'Speichern…' : 'Hinzufügen'}
-            </button>
+            </div>
+            <div className="px-6 pt-3 pb-10 flex-shrink-0 border-t border-gray-100">
+              <button
+                onClick={submit}
+                disabled={saving || !desc.trim() || !amount || parts.length === 0}
+                className="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl active:scale-95 transition-transform disabled:opacity-50"
+              >
+                {saving ? 'Speichern…' : 'Hinzufügen'}
+              </button>
+            </div>
           </div>
         </div>
       )}
