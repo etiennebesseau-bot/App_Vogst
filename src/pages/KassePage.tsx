@@ -312,8 +312,6 @@ export default function KassePage() {
             </div>
           </div>
         </>
-
-        </div>
       )}
     </div>
   )
