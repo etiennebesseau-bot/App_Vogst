@@ -119,6 +119,29 @@ export const TASKS: Task[] = [
     scheduledDates: GELBER_SACK,
   },
 
+  // Müll reinholen
+  {
+    id: 't-16',
+    title: 'Papiertonne reinholen',
+    points: 2,
+    categoryId: 'cat-muell',
+    scheduledDates: PAPIERTONNE,
+  },
+  {
+    id: 't-17',
+    title: 'Graue Tonne reinholen',
+    points: 2,
+    categoryId: 'cat-muell',
+    scheduledDates: GRAUE_TONNE,
+  },
+  {
+    id: 't-18',
+    title: 'Gelber Sack reinholen',
+    points: 2,
+    categoryId: 'cat-muell',
+    scheduledDates: GELBER_SACK,
+  },
+
   // Gemeinschaft (pro Person, unabhängig voneinander)
   {
     id: 't-14',
