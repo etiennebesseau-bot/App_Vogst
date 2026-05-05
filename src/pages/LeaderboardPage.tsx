@@ -7,7 +7,7 @@ const MONTH_NAMES = ['Januar','Februar','März','April','Mai','Juni','Juli','Aug
 type Period = 'monthly' | 'total' | 'teams'
 
 export default function LeaderboardPage() {
-  const { residents, apartments, getResidentStats, currentResidentId, refresh } = useApp()
+  const { residents, apartments, getResidentStats, currentResidentId, giveKudo, hasGivenKudoToday, refresh } = useApp()
   const [period, setPeriod] = useState<Period>('monthly')
 
   const currentMonth = MONTH_NAMES[new Date().getMonth()]
@@ -80,6 +80,9 @@ export default function LeaderboardPage() {
             {ranked.map((entry, index) => {
               const pts  = period === 'monthly' ? entry.stats.monthlyPoints : entry.stats.totalPoints
               const isMe = entry.resident.id === currentResidentId
+              const myApartmentId = residents.find(r => r.id === currentResidentId)?.apartmentId
+              const canKudo = currentResidentId && !isMe && entry.resident.apartmentId !== myApartmentId
+              const alreadyGave = canKudo && hasGivenKudoToday(entry.resident.id)
               return (
                 <div
                   key={entry.resident.id}
@@ -102,9 +105,20 @@ export default function LeaderboardPage() {
                       {entry.stats.streak > 1 && <span className="ml-1">· 🔥{entry.stats.streak}T</span>}
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="font-extrabold text-xl text-gray-900">{pts}</p>
-                    <p className="text-xs text-gray-400">Pkt.</p>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    {canKudo && (
+                      <button
+                        onClick={() => !alreadyGave && giveKudo(entry.resident.id)}
+                        className={`text-xl transition-all active:scale-125 ${alreadyGave ? 'opacity-30' : 'hover:scale-110'}`}
+                        title={alreadyGave ? 'Heute schon vergeben' : '+1 Punkt geben'}
+                      >
+                        🤝
+                      </button>
+                    )}
+                    <div className="text-right">
+                      <p className="font-extrabold text-xl text-gray-900">{pts}</p>
+                      <p className="text-xs text-gray-400">Pkt.</p>
+                    </div>
                   </div>
                 </div>
               )

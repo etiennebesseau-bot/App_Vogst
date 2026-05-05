@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { TaskCompletion, Expense } from '../types'
+import { TaskCompletion, Expense, Kudos } from '../types'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -83,6 +83,24 @@ export async function insertExpense(e: Omit<Expense, 'id' | 'createdAt'>): Promi
 
 export async function deleteExpense(id: string): Promise<void> {
   const { error } = await supabase.from('expenses').delete().eq('id', id)
+  if (error) throw error
+}
+
+// ─── Kudos ────────────────────────────────────────────────────────────────────
+
+export async function fetchKudos(): Promise<Kudos[]> {
+  const { data, error } = await supabase.from('kudos').select('*').order('created_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []).map(row => ({
+    id:              row.id,
+    fromResidentId:  row.from_resident_id,
+    toResidentId:    row.to_resident_id,
+    createdAt:       row.created_at,
+  }))
+}
+
+export async function insertKudo(fromResidentId: string, toResidentId: string): Promise<void> {
+  const { error } = await supabase.from('kudos').insert({ from_resident_id: fromResidentId, to_resident_id: toResidentId })
   if (error) throw error
 }
 

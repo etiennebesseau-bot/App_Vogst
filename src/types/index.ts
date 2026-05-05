@@ -51,6 +51,13 @@ export interface Expense {
   createdAt: string
 }
 
+export interface Kudos {
+  id: string
+  fromResidentId: string
+  toResidentId: string
+  createdAt: string
+}
+
 export interface LevelInfo {
   level: number
   name: string

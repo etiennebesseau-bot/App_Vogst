@@ -83,16 +83,16 @@ const GELBER_SACK: string[] = [
 
 export const TASKS: Task[] = [
   // Reinigung (innen)
-  { id: 't-01', title: 'Treppenhaus saugen',              points: 20, categoryId: 'cat-reinigung', recurrenceDays: 14 },
+  { id: 't-01', title: 'Treppenhaus saugen',              points: 10, categoryId: 'cat-reinigung', recurrenceDays: 14 },
   { id: 't-02', title: 'Hauseingangstreppe fegen',         points:  8, categoryId: 'cat-reinigung', recurrenceDays: 7  },
   { id: 't-03', title: 'Hauseingangbereich fegen',         points: 10, categoryId: 'cat-reinigung', recurrenceDays: 7  },
   { id: 't-04', title: 'Armaturen im Treppenhaus reinigen',points: 12, categoryId: 'cat-reinigung', recurrenceDays: 14 },
-  { id: 't-05', title: 'Keller saugen',                    points: 15, categoryId: 'cat-reinigung', recurrenceDays: 30 },
+  { id: 't-05', title: 'Keller saugen',                    points: 10, categoryId: 'cat-reinigung', recurrenceDays: 30 },
 
   // Außenbereich
   { id: 't-06', title: 'Strasse fegen',          points: 15, categoryId: 'cat-aussen', recurrenceDays: 14 },
   { id: 't-07', title: 'Hinterer Bereich fegen', points: 10, categoryId: 'cat-aussen', recurrenceDays: 14 },
-  { id: 't-08', title: 'Pflanzen entfernen',     points: 10, categoryId: 'cat-aussen', recurrenceDays: 14 },
+  { id: 't-08', title: 'Pflanzen entfernen',     points: 15, categoryId: 'cat-aussen', recurrenceDays: 14 },
   { id: 't-09', title: 'Grünschnitt wegbringen', points: 18, categoryId: 'cat-aussen', recurrenceDays: 30 },
   { id: 't-10', title: 'Schnee wegräumen',        points: 25, categoryId: 'cat-aussen', recurrenceDays: 1  },
 
