@@ -134,13 +134,6 @@ export const TASKS: Task[] = [
     categoryId: 'cat-muell',
     scheduledDates: GRAUE_TONNE,
   },
-  {
-    id: 't-18',
-    title: 'Gelber Sack reinholen',
-    points: 2,
-    categoryId: 'cat-muell',
-    scheduledDates: GELBER_SACK,
-  },
 
   // Gemeinschaft (pro Person, unabhängig voneinander)
   {
