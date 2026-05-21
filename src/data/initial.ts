@@ -84,8 +84,7 @@ const GELBER_SACK: string[] = [
 export const TASKS: Task[] = [
   // Reinigung (innen)
   { id: 't-01', title: 'Treppenhaus saugen',              points: 10, categoryId: 'cat-reinigung', recurrenceDays: 14 },
-  { id: 't-02', title: 'Hauseingangstreppe fegen',         points:  8, categoryId: 'cat-reinigung', recurrenceDays: 7  },
-  { id: 't-03', title: 'Hauseingangbereich fegen',         points: 10, categoryId: 'cat-reinigung', recurrenceDays: 7  },
+  { id: 't-03', title: 'Hauseingangbereich fegen',         points:  8, categoryId: 'cat-reinigung', recurrenceDays: 7  },
   { id: 't-04', title: 'Armaturen im Treppenhaus reinigen',points: 12, categoryId: 'cat-reinigung', recurrenceDays: 14 },
   { id: 't-05', title: 'Keller saugen',                    points: 10, categoryId: 'cat-reinigung', recurrenceDays: 30 },
 

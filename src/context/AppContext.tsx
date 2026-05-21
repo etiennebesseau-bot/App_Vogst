@@ -145,19 +145,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         )
       }
 
+      // Tasks with a long cycle (≥14 days) can be redone after 5 days minimum if needed early
+      const cooldown = (task.recurrenceDays ?? 7) >= 14 ? 5 : (task.recurrenceDays ?? 7)
+
       if (task.perResident && currentResidentId) {
         const last = completions
           .filter(c => c.taskId === task.id && c.residentId === currentResidentId)
           .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0]
         if (!last) return true
-        return (now - new Date(last.completedAt).getTime()) / 86400000 >= (task.recurrenceDays ?? 7)
+        return (now - new Date(last.completedAt).getTime()) / 86400000 >= cooldown
       }
 
       const last = completions
         .filter(c => c.taskId === task.id)
         .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0]
       if (!last) return true
-      return (now - new Date(last.completedAt).getTime()) / 86400000 >= (task.recurrenceDays ?? 7)
+      return (now - new Date(last.completedAt).getTime()) / 86400000 >= cooldown
     },
     [completions, currentResidentId],
   )
