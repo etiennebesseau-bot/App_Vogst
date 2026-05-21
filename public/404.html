@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<script>
+  // GitHub Pages SPA redirect: encodes the path into the query string
+  // so that index.html can reconstruct the correct URL for React Router.
+  var segmentCount = 1; // matches base: '/App_Vogst/'
+  var l = window.location;
+  l.replace(
+    l.protocol + '//' + l.host +
+    l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?/' +
+    l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+    (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+    l.hash
+  );
+</script>
