@@ -10,8 +10,8 @@ self.addEventListener('push', (event: PushEvent) => {
   event.waitUntil(
     self.registration.showNotification(data?.title ?? '🏠 Vogesenstrasse', {
       body: data?.body ?? '',
-      icon: '/pwa-192.png',
-      badge: '/pwa-192.png',
+      icon: '/App_Vogst/pwa-192.png',
+      badge: '/App_Vogst/pwa-192.png',
       tag: 'trash-reminder',
     }),
   )
@@ -19,5 +19,5 @@ self.addEventListener('push', (event: PushEvent) => {
 
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close()
-  event.waitUntil(self.clients.openWindow('/'))
+  event.waitUntil(self.clients.openWindow('/App_Vogst/'))
 })
