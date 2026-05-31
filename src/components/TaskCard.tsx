@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Task, TaskCompletion } from '../types'
-import { CATEGORIES, getNextScheduledDate } from '../data/initial'
+import { CATEGORIES, RESIDENTS, getNextScheduledDate } from '../data/initial'
 
 interface Props {
   task: Task
@@ -46,6 +46,8 @@ export default function TaskCard({ task, completed = false, lastCompletion, onCo
         )}
         {completed && lastCompletion && (
           <p className="text-xs text-gray-400 mt-0.5">
+            {RESIDENTS.find(r => r.id === lastCompletion.residentId)?.emoji}{' '}
+            {RESIDENTS.find(r => r.id === lastCompletion.residentId)?.name} ·{' '}
             {new Date(lastCompletion.completedAt).toLocaleDateString('de-DE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
           </p>
         )}
